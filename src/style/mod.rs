@@ -2,6 +2,7 @@ use crate::api1::cmd;
 use crate::CommandLineEmbeddingInterface;
 use std::io::Write;
 
+pub mod line;
 pub mod marker;
 
 #[derive(Copy, Clone, PartialOrd, PartialEq)]
@@ -94,6 +95,52 @@ impl ColorMap {
             ColorMap::BrownBlueStep12 => "brown-blue-step12",
             ColorMap::BlueOrangeStep12 => "blue-orange-step12",
             ColorMap::SeqStep25 => "seq-step25",
+        }
+    }
+}
+
+/// https://github.com/veusz/veusz/blob/0227b68591accd1c46d25291ad6167e4d244eebb/veusz/document/colors.py#L131
+#[derive(Copy, Clone, PartialOrd, PartialEq)]
+pub enum ColorName {
+    Auto,
+    Foreground,
+    Transparent,
+    White,
+    Black,
+    Red,
+    Green,
+    Blue,
+    Cyan,
+    Magenta,
+    Yellow,
+    Grey,
+    Darkred,
+    Darkgreen,
+    Darkblue,
+    Darkcyan,
+    Darkmagenta,
+}
+
+impl ColorName {
+    pub(crate) fn as_veusz_value_str(self) -> &'static str {
+        match self {
+            ColorName::Auto => "auto",
+            ColorName::Foreground => "foreground",
+            ColorName::Transparent => "transparent",
+            ColorName::White => "white",
+            ColorName::Black => "black",
+            ColorName::Red => "red",
+            ColorName::Green => "green",
+            ColorName::Blue => "blue",
+            ColorName::Cyan => "cyan",
+            ColorName::Magenta => "magenta",
+            ColorName::Yellow => "yellow",
+            ColorName::Grey => "grey",
+            ColorName::Darkred => "darkred",
+            ColorName::Darkgreen => "darkgreen",
+            ColorName::Darkblue => "darkblue",
+            ColorName::Darkcyan => "darkcyan",
+            ColorName::Darkmagenta => "darkmagenta",
         }
     }
 }
