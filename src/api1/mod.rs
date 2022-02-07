@@ -52,3 +52,16 @@ impl<T: CommandLineEmbeddingInterface> AutoNameIncrement<T> {
         )
     }
 }
+
+pub(crate) trait AsVueszApi1ValueStr {
+    fn as_veusz_api1_value_str(&self) -> &str;
+}
+
+impl AsVueszApi1ValueStr for bool {
+    fn as_veusz_api1_value_str(&self) -> &str {
+        match self {
+            true => "True",
+            false => "False",
+        }
+    }
+}

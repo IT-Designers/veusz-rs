@@ -1,4 +1,4 @@
-use crate::api1::cmd;
+use crate::api1::{cmd, AsVueszApi1ValueStr};
 use crate::style::line::LineStyle;
 use crate::style::{ColorMap, ColorName};
 use crate::CommandLineEmbeddingInterface;
@@ -31,7 +31,7 @@ impl MarkerLine {
     }
 
     pub fn set_color_by_name(&mut self, color_name: ColorName) {
-        self.color = Some(color_name.as_veusz_value_str().to_string());
+        self.color = Some(color_name.as_veusz_api1_value_str().to_string());
     }
 
     pub fn with_color_by_name(mut self, color_name: ColorName) -> Self {
@@ -96,7 +96,7 @@ impl CommandLineEmbeddingInterface for MarkerLine {
         }
 
         if let Some(style) = &self.style {
-            cmd::Set("MarkerLine/style", style.as_veusz_value_str()).write(writer)?;
+            cmd::Set("MarkerLine/style", style.as_veusz_api1_value_str()).write(writer)?;
         }
 
         if let Some(transparency) = &self.transparency {
@@ -104,25 +104,11 @@ impl CommandLineEmbeddingInterface for MarkerLine {
         }
 
         if let Some(scale) = &self.scale {
-            cmd::Set(
-                "MarkerLine/scaleLine",
-                match scale {
-                    true => "True",
-                    false => "False",
-                },
-            )
-            .write(writer)?;
+            cmd::Set("MarkerLine/scaleLine", scale.as_veusz_api1_value_str()).write(writer)?;
         }
 
         if let Some(hide) = &self.hide {
-            cmd::SetRaw(
-                "MarkerLine/hide",
-                match hide {
-                    true => "True",
-                    false => "False",
-                },
-            )
-            .write(writer)?;
+            cmd::SetRaw("MarkerLine/hide", hide.as_veusz_api1_value_str()).write(writer)?;
         }
 
         Ok(())
@@ -168,27 +154,17 @@ impl MarkerFill {
 impl CommandLineEmbeddingInterface for MarkerFill {
     fn write<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
         if let Some(hide) = &self.hide {
-            cmd::SetRaw(
-                "MarkerFill/hide",
-                match hide {
-                    true => "True",
-                    false => "False",
-                },
-            )
-            .write(writer)?;
+            cmd::SetRaw("MarkerFill/hide", hide.as_veusz_api1_value_str()).write(writer)?;
         }
 
         if let Some(color_map) = &self.color_map {
-            cmd::Set("MarkerFill/colorMap", color_map.as_veusz_value_str()).write(writer)?;
+            cmd::Set("MarkerFill/colorMap", color_map.as_veusz_api1_value_str()).write(writer)?;
         }
 
         if let Some(invert) = &self.color_map_invert {
             cmd::SetRaw(
                 "MarkerFill/colorMapInvert",
-                match invert {
-                    true => "True",
-                    false => "False",
-                },
+                invert.as_veusz_api1_value_str(),
             )
             .write(writer)?;
         }

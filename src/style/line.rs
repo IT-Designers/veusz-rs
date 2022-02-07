@@ -1,3 +1,5 @@
+use crate::api1::AsVueszApi1ValueStr;
+
 /// https://github.com/veusz/veusz/blob/b06b5da124c7d712bafadfc86f75f474a655625c/veusz/setting/setting.py#L1424
 #[derive(Copy, Clone, PartialOrd, PartialEq)]
 pub enum LineStyle {
@@ -23,8 +25,8 @@ pub enum LineStyle {
     DashDot3,
 }
 
-impl LineStyle {
-    pub(crate) fn as_veusz_value_str(self) -> &'static str {
+impl AsVueszApi1ValueStr for LineStyle {
+    fn as_veusz_api1_value_str(&self) -> &str {
         match self {
             LineStyle::Solid => "solid",
             LineStyle::Dashed => "dashed",

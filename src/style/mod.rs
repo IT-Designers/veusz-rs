@@ -1,4 +1,4 @@
-use crate::api1::cmd;
+use crate::api1::{cmd, AsVueszApi1ValueStr};
 use crate::CommandLineEmbeddingInterface;
 use std::io::Write;
 
@@ -51,8 +51,8 @@ pub enum ColorMap {
     SeqStep25,
 }
 
-impl ColorMap {
-    pub(crate) fn as_veusz_value_str(self) -> &'static str {
+impl AsVueszApi1ValueStr for ColorMap {
+    fn as_veusz_api1_value_str(&self) -> &str {
         match self {
             ColorMap::Blank => "blank",
             ColorMap::Heat => "heat",
@@ -121,8 +121,8 @@ pub enum ColorName {
     Darkmagenta,
 }
 
-impl ColorName {
-    pub(crate) fn as_veusz_value_str(self) -> &'static str {
+impl AsVueszApi1ValueStr for ColorName {
+    fn as_veusz_api1_value_str(&self) -> &str {
         match self {
             ColorName::Auto => "auto",
             ColorName::Foreground => "foreground",
