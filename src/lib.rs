@@ -33,6 +33,11 @@ impl Veusz {
         self
     }
 
+    pub fn with_data_sets(mut self, datasets: impl IntoIterator<Item = Data>) -> Self {
+        self.data.extend(datasets);
+        self
+    }
+
     pub fn open(self) {
         let mut proc = std::process::Command::new("veusz")
             .arg("--listen")
@@ -43,7 +48,7 @@ impl Veusz {
             .unwrap();
 
         self.write(std::io::stdout().borrow_mut()).unwrap();
-        self.write(proc.stdin.as_mut().unwrap());
+        self.write(proc.stdin.as_mut().unwrap()).unwrap();
 
         proc.wait().unwrap();
     }
@@ -51,6 +56,9 @@ impl Veusz {
 
 impl CommandLineEmbeddingInterface for Veusz {
     fn write<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        // cmd::Set("colorTheme", "default-latest").write(writer)?;
+        // cmd::Set("StyleSheet/axis-function/autoRange", "next-tick").write(writer)?;
+
         for data in &self.data {
             data.write(writer)?;
         }
