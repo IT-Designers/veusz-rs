@@ -1,4 +1,4 @@
-use std::fmt::{format, Debug, Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::io::Result;
 use std::io::Write;
 use std::marker::PhantomData;
@@ -43,13 +43,12 @@ impl<T: CommandLineEmbeddingInterface> Display for AutoName<T> {
 pub(crate) struct AutoNameIncrement<T>(PhantomData<T>);
 
 impl<T: CommandLineEmbeddingInterface> AutoNameIncrement<T> {
-    const COUNTER: AtomicUsize = AtomicUsize::new(1);
-
     pub fn next() -> String {
+        static COUNTER: AtomicUsize = AtomicUsize::new(1);
         format!(
             "{}{}",
             std::any::type_name::<T>(),
-            Self::COUNTER.fetch_add(1, Ordering::Relaxed)
+            COUNTER.fetch_add(1, Ordering::Relaxed)
         )
     }
 }
