@@ -1,5 +1,4 @@
 use crate::api1::ToParentDropGuard;
-use crate::CommandLineEmbeddingInterface;
 use std::io::Write;
 
 #[must_use]
@@ -7,7 +6,11 @@ pub struct Add<'a, 'b>(pub &'a str, pub &'b str);
 
 impl Add<'_, '_> {
     pub fn write<W: Write>(self, writer: &mut W) -> std::io::Result<()> {
-        writeln!(writer, "Add('{}', name=u'{}')", self.0, self.1)
+        writeln!(
+            writer,
+            "Add('{}', name=u'{}', autoadd=False)",
+            self.0, self.1
+        )
     }
 }
 
