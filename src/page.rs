@@ -1,4 +1,6 @@
 use crate::api1::{cmd, AutoName};
+use crate::style::marker::{Marker, MarkerFill, MarkerLine};
+use crate::style::Color;
 use crate::CommandLineEmbeddingInterface;
 use std::io::Write;
 
@@ -142,14 +144,12 @@ impl CommandLineEmbeddingInterface for Axis {
     }
 }
 
-#[derive(Copy, Clone, PartialOrd, PartialEq)]
-pub enum XyMarker {
-    None,
-}
-
 pub struct Xy {
     name: AutoName<Self>,
-    marker: Option<XyMarker>,
+    color: Option<Color>,
+    marker: Option<Marker>,
+    marker_line: Option<MarkerLine>,
+    marker_fill: Option<MarkerFill>,
     x_data: String,
     y_data: String,
 }
@@ -158,18 +158,48 @@ impl Xy {
     pub fn data(x_data: impl Into<String>, y_data: impl Into<String>) -> Self {
         Self {
             name: AutoName::default(),
+            color: None,
             marker: None,
+            marker_line: None,
+            marker_fill: None,
             x_data: x_data.into(),
             y_data: y_data.into(),
         }
     }
 
-    pub fn set_marker(&mut self, marker: XyMarker) {
+    pub fn set_color(&mut self, color: Color) {
+        self.color = Some(color);
+    }
+
+    pub fn with_color(mut self, color: Color) -> Self {
+        self.set_color(color);
+        self
+    }
+
+    pub fn set_marker(&mut self, marker: Marker) {
         self.marker = Some(marker);
     }
 
-    pub fn with_marker(mut self, marker: XyMarker) -> Self {
+    pub fn with_marker(mut self, marker: Marker) -> Self {
         self.set_marker(marker);
+        self
+    }
+
+    pub fn set_marker_line(&mut self, marker_line: MarkerLine) {
+        self.marker_line = Some(marker_line);
+    }
+
+    pub fn with_marker_line(mut self, marker_line: MarkerLine) -> Self {
+        self.set_marker_line(marker_line);
+        self
+    }
+
+    pub fn set_marker_fill(&mut self, marker_fill: MarkerFill) {
+        self.marker_fill = Some(marker_fill);
+    }
+
+    pub fn with_marker_fill(mut self, marker_fill: MarkerFill) -> Self {
+        self.set_marker_fill(marker_fill);
         self
     }
 }
@@ -182,10 +212,23 @@ impl CommandLineEmbeddingInterface for Xy {
                 cmd::Set(
                     "marker",
                     match marker {
-                        XyMarker::None => "none",
+                        Marker::None => "none",
+                        Marker::Circle => "circle",
                     },
                 )
                 .write(writer)?;
+            }
+
+            if let Some(color) = &self.color {
+                color.write(writer)?;
+            }
+
+            if let Some(marker_line) = &self.marker_line {
+                marker_line.write(writer)?;
+            }
+
+            if let Some(marker_fill) = &self.marker_fill {
+                marker_fill.write(writer)?;
             }
 
             cmd::Set("xData", &self.x_data).write(writer)?;

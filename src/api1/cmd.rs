@@ -1,4 +1,5 @@
 use crate::api1::ToParentDropGuard;
+use std::fmt::Display;
 use std::io::Write;
 
 #[must_use]
@@ -34,6 +35,15 @@ pub struct Set<'a, 'b>(pub &'a str, pub &'b str);
 impl Set<'_, '_> {
     pub fn write<W: Write>(self, writer: &mut W) -> std::io::Result<()> {
         writeln!(writer, "Set('{}', u'{}')", self.0, self.1)
+    }
+}
+
+#[must_use]
+pub struct SetRaw<'a, V: Display>(pub &'a str, pub V);
+
+impl<V: Display> SetRaw<'_, V> {
+    pub fn write<W: Write>(self, writer: &mut W) -> std::io::Result<()> {
+        writeln!(writer, "Set('{}', {})", self.0, self.1)
     }
 }
 

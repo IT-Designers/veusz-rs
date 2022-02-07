@@ -7,6 +7,7 @@ use std::io::Write;
 pub mod api1;
 pub mod data;
 pub mod page;
+pub mod style;
 
 #[derive(Default)]
 pub struct Veusz {
