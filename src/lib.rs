@@ -1,18 +1,21 @@
 use crate::api1::CommandLineEmbeddingInterface;
 use crate::data::Data;
+use crate::export::Export;
 use crate::page::Page;
 use std::borrow::BorrowMut;
 use std::io::Write;
 
 pub mod api1;
 pub mod data;
+pub mod export;
 pub mod page;
 pub mod style;
 
 #[derive(Default)]
 pub struct Veusz {
-    pages: Vec<Page>,
     data: Vec<Data>,
+    pages: Vec<Page>,
+    exports: Vec<Export>,
 }
 
 impl Veusz {
@@ -36,6 +39,11 @@ impl Veusz {
 
     pub fn with_data_sets(mut self, datasets: impl IntoIterator<Item = Data>) -> Self {
         self.data.extend(datasets);
+        self
+    }
+
+    pub fn with_export(mut self, export: impl Into<Export>) -> Self {
+        self.exports.push(export.into());
         self
     }
 
@@ -63,9 +71,15 @@ impl CommandLineEmbeddingInterface for Veusz {
         for data in &self.data {
             data.write(writer)?;
         }
+
         for page in &self.pages {
             page.write(writer)?;
         }
+
+        for export in &self.exports {
+            export.write(writer)?;
+        }
+
         Ok(())
     }
 }
