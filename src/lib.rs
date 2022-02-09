@@ -3,7 +3,10 @@ use crate::data::Data;
 use crate::export::Export;
 use crate::page::Page;
 use std::borrow::BorrowMut;
+use std::fs::OpenOptions;
 use std::io::Write;
+use std::path::Path;
+use std::process::ExitStatus;
 
 pub mod api1;
 pub mod data;
@@ -47,9 +50,19 @@ impl Veusz {
         self
     }
 
+    pub fn save_configuration<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        self.write(writer)
+    }
+
+    pub fn with_saved_configuration<W: Write>(self, writer: &mut W) -> std::io::Result<Self> {
+        self.save_configuration(writer)?;
+        Ok(self)
+    }
+
     pub fn open(self) {
         let mut proc = std::process::Command::new("veusz")
             .arg("--listen")
+            .arg("--quiet")
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::inherit())
             .stderr(std::process::Stdio::inherit())
@@ -60,6 +73,23 @@ impl Veusz {
         self.write(proc.stdin.as_mut().unwrap()).unwrap();
 
         proc.wait().unwrap();
+    }
+
+    pub fn open_saved_configuration<P: AsRef<Path>>(
+        self,
+        path: P,
+        options: &OpenOptions,
+    ) -> impl FnMut() -> std::io::Result<ExitStatus> {
+        self.write(std::io::stdout().borrow_mut()).unwrap();
+        self.write(&mut options.open(path.as_ref()).unwrap())
+            .unwrap();
+
+        let mut proc = std::process::Command::new("veusz")
+            .arg(path.as_ref().as_os_str())
+            .spawn()
+            .unwrap();
+
+        move || proc.wait()
     }
 }
 
