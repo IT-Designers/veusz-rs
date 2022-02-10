@@ -59,10 +59,10 @@ impl Veusz {
         Ok(self)
     }
 
+    /// Warning: might not work properly or with very poor performance
     pub fn open(self) {
         let mut proc = std::process::Command::new("veusz")
             .arg("--listen")
-            .arg("--quiet")
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::inherit())
             .stderr(std::process::Stdio::inherit())
@@ -85,6 +85,7 @@ impl Veusz {
             .unwrap();
 
         let mut proc = std::process::Command::new("veusz")
+            .arg("--unsafe-mode")
             .arg(path.as_ref().as_os_str())
             .spawn()
             .unwrap();
