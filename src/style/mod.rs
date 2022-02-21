@@ -4,6 +4,7 @@ use std::io::Write;
 
 pub mod line;
 pub mod marker;
+pub mod plot;
 
 #[derive(Copy, Clone, PartialOrd, PartialEq)]
 pub enum ColorMap {

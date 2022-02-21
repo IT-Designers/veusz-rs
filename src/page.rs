@@ -1,5 +1,6 @@
 use crate::api1::{cmd, AutoName};
 use crate::style::marker::{Marker, MarkerFill, MarkerLine};
+use crate::style::plot::PlotLine;
 use crate::style::Color;
 use crate::CommandLineEmbeddingInterface;
 use std::io::Write;
@@ -150,6 +151,7 @@ pub struct Xy {
     marker: Option<Marker>,
     marker_line: Option<MarkerLine>,
     marker_fill: Option<MarkerFill>,
+    plot_line: Option<PlotLine>,
     x_data: String,
     y_data: String,
 }
@@ -162,6 +164,7 @@ impl Xy {
             marker: None,
             marker_line: None,
             marker_fill: None,
+            plot_line: None,
             x_data: x_data.into(),
             y_data: y_data.into(),
         }
@@ -202,6 +205,15 @@ impl Xy {
         self.set_marker_fill(marker_fill);
         self
     }
+
+    pub fn set_plot_line(&mut self, plot_line: PlotLine) {
+        self.plot_line = Some(plot_line);
+    }
+
+    pub fn with_plot_line(mut self, plot_line: PlotLine) -> Self {
+        self.set_plot_line(plot_line);
+        self
+    }
 }
 
 impl CommandLineEmbeddingInterface for Xy {
@@ -229,6 +241,10 @@ impl CommandLineEmbeddingInterface for Xy {
 
             if let Some(marker_fill) = &self.marker_fill {
                 marker_fill.write(writer)?;
+            }
+
+            if let Some(plot_line) = &self.plot_line {
+                plot_line.write(writer)?;
             }
 
             cmd::Set("xData", &self.x_data).write(writer)?;
