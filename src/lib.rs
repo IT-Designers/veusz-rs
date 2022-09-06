@@ -4,7 +4,7 @@ use crate::export::Export;
 use crate::page::Page;
 use std::borrow::BorrowMut;
 use std::fs::OpenOptions;
-use std::io::Write;
+use std::io::{BufWriter, Write};
 use std::path::Path;
 use std::process::ExitStatus;
 
@@ -50,10 +50,12 @@ impl Veusz {
         self
     }
 
+    /// Please consider [`BufWriter`] for optimal performance.
     pub fn save_configuration<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
         self.write(writer)
     }
 
+    /// Please consider [`BufWriter`] for optimal performance.
     pub fn with_saved_configuration<W: Write>(self, writer: &mut W) -> std::io::Result<Self> {
         self.save_configuration(writer)?;
         Ok(self)
@@ -69,8 +71,10 @@ impl Veusz {
             .spawn()
             .unwrap();
 
-        self.write(std::io::stdout().borrow_mut()).unwrap();
-        self.write(proc.stdin.as_mut().unwrap()).unwrap();
+        self.write(BufWriter::new(std::io::stdout()).borrow_mut())
+            .unwrap();
+        self.write(BufWriter::new(proc.stdin.as_mut().unwrap()).borrow_mut())
+            .unwrap();
 
         proc.wait().unwrap();
     }
@@ -80,8 +84,9 @@ impl Veusz {
         path: P,
         options: &OpenOptions,
     ) -> impl FnMut() -> std::io::Result<ExitStatus> {
-        self.write(std::io::stdout().borrow_mut()).unwrap();
-        self.write(&mut options.open(path.as_ref()).unwrap())
+        self.write(BufWriter::new(std::io::stdout()).borrow_mut())
+            .unwrap();
+        self.write(BufWriter::new(options.open(path.as_ref()).unwrap()).borrow_mut())
             .unwrap();
 
         let mut proc = std::process::Command::new("veusz")
