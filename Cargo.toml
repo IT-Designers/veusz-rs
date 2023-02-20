@@ -2,6 +2,13 @@
 name = "veusz"
 version = "0.1.0"
 edition = "2021"
+authors = ["Michael Watzko <michael.watzko@it-designers.de>"]
+description = "Veusz command line and embedding interface (API) for Rust"
+keywords = ["veusz", "api", "plot", "graph", "cli"]
+categories = ["visualization", "api-bindings"]
+repository = "https://github.com/itdesigners/veusz-rs"
+license-file = "LICENSE"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
