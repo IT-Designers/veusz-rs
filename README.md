@@ -1,9 +1,9 @@
 # veusz - Rust Wrapper API for [Veusz](https://veusz.github.io/) 
 
 [![Build Status](https://github.com/itdesigners/veusz-rs/workflows/Rust/badge.svg)](https://github.com/itdesigners/veusz-rs/actions?query=workflow%3ARust)
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](https://github.com/itdesigners/veusz-rs)
-[![Crates.io](https://img.shields.io/crates/v/asn1rs.svg)](https://crates.io/crates/asn1rs)
-[![Documentation](https://docs.rs/asn1rs/badge.svg)](https://docs.rs/asn1rs)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/itdesigners/veusz-rs)
+[![Crates.io](https://img.shields.io/crates/v/veusz.svg)](https://crates.io/crates/veusz)
+[![Documentation](https://docs.rs/veusz/badge.svg)](https://docs.rs/veusz)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/itdesigners/veusz-rs/issues/new)
 
 This crate provides a Rust API for the [Veusz command line and embedding interface (API)](https://veusz.github.io/docs/manual/api.html).
