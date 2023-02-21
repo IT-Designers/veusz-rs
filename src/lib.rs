@@ -31,6 +31,11 @@ impl Veusz {
         self
     }
 
+    pub fn with_pages(mut self, pages: impl IntoIterator<Item = Page>) -> Self {
+        self.pages.extend(pages);
+        self
+    }
+
     pub fn add_data(&mut self, data: Data) {
         self.data.push(data);
     }
