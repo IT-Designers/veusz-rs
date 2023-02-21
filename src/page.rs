@@ -57,11 +57,21 @@ impl CommandLineEmbeddingInterface for PageItem {
 #[derive(Default)]
 pub struct Graph {
     name: AutoName<Self>,
+    aspect: Option<f64>,
     axes: Vec<Axis>,
     xy_data: Vec<Xy>,
 }
 
 impl Graph {
+    pub fn set_aspect(&mut self, aspect: f64) {
+        self.aspect = Some(aspect);
+    }
+
+    pub fn with_aspect(mut self, aspect: f64) -> Self {
+        self.set_aspect(aspect);
+        self
+    }
+
     pub fn add_axis(&mut self, axis: Axis) {
         self.axes.push(axis);
     }
@@ -79,6 +89,7 @@ impl Graph {
         self.add_xy(xy);
         self
     }
+
     pub fn with_xy_sets(mut self, sets: impl IntoIterator<Item = Xy>) -> Self {
         self.xy_data.extend(sets);
         self
@@ -89,6 +100,9 @@ impl CommandLineEmbeddingInterface for Graph {
     fn write<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
         cmd::Add("graph", &self.name).write(writer)?;
         cmd::ToUnique(&self.name).for_call(writer, |writer| {
+            if let Some(aspect) = self.aspect {
+                cmd::SetRaw("aspect", aspect).write(writer)?;
+            }
             for axis in &self.axes {
                 axis.write(writer)?;
             }
