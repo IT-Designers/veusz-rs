@@ -57,17 +57,17 @@ impl CommandLineEmbeddingInterface for PageItem {
 #[derive(Default)]
 pub struct Graph {
     name: AutoName<Self>,
-    aspect: Option<f64>,
+    aspect: Option<AspectRatio>,
     axes: Vec<Axis>,
     xy_data: Vec<Xy>,
 }
 
 impl Graph {
-    pub fn set_aspect(&mut self, aspect: f64) {
-        self.aspect = Some(aspect);
+    pub fn set_aspect(&mut self, aspect: impl Into<AspectRatio>) {
+        self.aspect = Some(aspect.into());
     }
 
-    pub fn with_aspect(mut self, aspect: f64) -> Self {
+    pub fn with_aspect(mut self, aspect: impl Into<AspectRatio>) -> Self {
         self.set_aspect(aspect);
         self
     }
@@ -101,7 +101,10 @@ impl CommandLineEmbeddingInterface for Graph {
         cmd::Add("graph", &self.name).write(writer)?;
         cmd::ToUnique(&self.name).for_call(writer, |writer| {
             if let Some(aspect) = self.aspect {
-                cmd::SetRaw("aspect", aspect).write(writer)?;
+                match aspect {
+                    AspectRatio::Auto => cmd::Set("aspect", "Auto").write(writer)?,
+                    AspectRatio::Fix(value) => cmd::SetRaw("aspect", value).write(writer)?,
+                }
             }
             for axis in &self.axes {
                 axis.write(writer)?;
@@ -112,6 +115,11 @@ impl CommandLineEmbeddingInterface for Graph {
             Ok(())
         })
     }
+}
+#[derive(derive_more::From, Copy, Clone, PartialEq)]
+pub enum AspectRatio {
+    Auto,
+    Fix(f64),
 }
 
 #[derive(Default)]
