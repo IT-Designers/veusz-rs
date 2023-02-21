@@ -42,12 +42,14 @@ impl CommandLineEmbeddingInterface for Page {
 #[derive(derive_more::From)]
 pub enum PageItem {
     Graph(Graph),
+    Grid(Grid),
 }
 
 impl CommandLineEmbeddingInterface for PageItem {
     fn write<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
         match self {
             PageItem::Graph(graph) => graph.write(writer),
+            PageItem::Grid(grid) => grid.write(writer),
         }
     }
 }
@@ -92,6 +94,66 @@ impl CommandLineEmbeddingInterface for Graph {
             }
             for xy in &self.xy_data {
                 xy.write(writer)?;
+            }
+            Ok(())
+        })
+    }
+}
+
+#[derive(Default)]
+pub struct Grid {
+    name: AutoName<Self>,
+    rows: Option<u32>,
+    columns: Option<u32>,
+    items: Vec<PageItem>,
+}
+
+impl Grid {
+    pub fn set_rows(&mut self, rows: u32) {
+        self.rows = Some(rows);
+    }
+
+    pub fn with_rows(mut self, rows: u32) -> Self {
+        self.set_rows(rows);
+        self
+    }
+
+    pub fn set_columns(&mut self, columns: u32) {
+        self.columns = Some(columns);
+    }
+
+    pub fn with_columns(mut self, columns: u32) -> Self {
+        self.set_columns(columns);
+        self
+    }
+
+    pub fn add(&mut self, item: impl Into<PageItem>) {
+        self.items.push(item.into());
+    }
+
+    pub fn with(mut self, item: impl Into<PageItem>) -> Self {
+        self.add(item);
+        self
+    }
+
+    pub fn with_items(mut self, items: impl IntoIterator<Item = impl Into<PageItem>>) -> Self {
+        self.items.extend(items.into_iter().map(Into::into));
+        self
+    }
+}
+
+impl CommandLineEmbeddingInterface for Grid {
+    fn write<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        cmd::Add("grid", &self.name).write(writer)?;
+        cmd::ToUnique(&self.name).for_call(writer, |writer| {
+            if let Some(rows) = self.rows {
+                cmd::SetRaw("rows", rows).write(writer)?;
+            }
+            if let Some(columns) = self.columns {
+                cmd::SetRaw("columns", columns).write(writer)?;
+            }
+            for item in &self.items {
+                item.write(writer)?;
             }
             Ok(())
         })
