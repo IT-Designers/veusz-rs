@@ -20,6 +20,11 @@ impl Page {
         self.add(item);
         self
     }
+
+    pub fn with_items(mut self, items: impl IntoIterator<Item = impl Into<PageItem>>) -> Self {
+        self.items.extend(items.into_iter().map(Into::into));
+        self
+    }
 }
 
 impl CommandLineEmbeddingInterface for Page {
