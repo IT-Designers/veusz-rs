@@ -16,7 +16,7 @@ impl Page {
         self.items.push(item.into());
     }
 
-    pub fn with(mut self, item: impl Into<PageItem>) -> Self {
+    pub fn with_item(mut self, item: impl Into<PageItem>) -> Self {
         self.add(item);
         self
     }
@@ -74,6 +74,12 @@ impl Graph {
 
     pub fn add_axis(&mut self, axis: Axis) {
         self.axes.push(axis);
+    }
+
+    pub fn with_xy_axis(mut self, x: impl Into<String>, y: impl Into<String>) -> Self {
+        self.add_axis(Axis::x(x));
+        self.add_axis(Axis::y(y));
+        self
     }
 
     pub fn with_axis(mut self, axis: Axis) -> Self {
