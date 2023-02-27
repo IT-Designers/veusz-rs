@@ -3,6 +3,7 @@ use crate::style::marker::{Marker, MarkerFill, MarkerLine};
 use crate::style::plot::PlotLine;
 use crate::style::Color;
 use crate::CommandLineEmbeddingInterface;
+use std::borrow::Cow;
 use std::io::Write;
 
 #[derive(Default)]
@@ -43,6 +44,7 @@ impl CommandLineEmbeddingInterface for Page {
 pub enum PageItem {
     Graph(Graph),
     Grid(Grid),
+    Label(Label),
 }
 
 impl CommandLineEmbeddingInterface for PageItem {
@@ -50,6 +52,7 @@ impl CommandLineEmbeddingInterface for PageItem {
         match self {
             PageItem::Graph(graph) => graph.write(writer),
             PageItem::Grid(grid) => grid.write(writer),
+            PageItem::Label(label) => label.write(writer),
         }
     }
 }
@@ -347,5 +350,195 @@ impl CommandLineEmbeddingInterface for Xy {
 
             Ok(())
         })
+    }
+}
+
+pub struct Label {
+    name: AutoName<Self>,
+    text: Cow<'static, str>,
+    x_positions: Vec<f64>,
+    y_positions: Vec<f64>,
+    align_horizontal: Option<Alignment>,
+    align_vertical: Option<Alignment>,
+    positioning: Option<Positioning>,
+    text_config: Option<TextConfig>,
+    // config: LabelConfig, // TODO
+}
+
+impl Label {
+    pub fn set_x_positions(&mut self, positions: impl Into<Vec<f64>>) {
+        self.x_positions = positions.into();
+    }
+
+    pub fn with_x_positions(mut self, positions: impl Into<Vec<f64>>) -> Self {
+        self.set_x_positions(positions);
+        self
+    }
+
+    pub fn set_y_positions(&mut self, positions: impl Into<Vec<f64>>) {
+        self.y_positions = positions.into();
+    }
+
+    pub fn with_y_positions(mut self, positions: impl Into<Vec<f64>>) -> Self {
+        self.set_y_positions(positions);
+        self
+    }
+
+    pub fn set_align_horizontal(&mut self, alignment: Alignment) {
+        self.align_horizontal = Some(alignment);
+    }
+
+    pub fn with_alignment_horizontal(mut self, alignemnt: Alignment) -> Self {
+        self.set_align_horizontal(alignemnt);
+        self
+    }
+
+    pub fn set_align_vertical(&mut self, alignment: Alignment) {
+        self.align_vertical = Some(alignment);
+    }
+
+    pub fn with_alignment_vertical(mut self, alignment: Alignment) -> Self {
+        self.set_align_vertical(alignment);
+        self
+    }
+
+    pub fn set_text_config(&mut self, text_config: impl Into<TextConfig>) {
+        self.text_config = Some(text_config.into());
+    }
+
+    pub fn with_text_config(mut self, text_config: impl Into<TextConfig>) -> Self {
+        self.set_text_config(text_config);
+        self
+    }
+
+    pub fn set_positioning(&mut self, positioning: impl Into<Positioning>) {
+        self.positioning = Some(positioning.into());
+    }
+
+    pub fn with_positioning(mut self, positioning: impl Into<Positioning>) -> Self {
+        self.set_positioning(positioning);
+        self
+    }
+}
+
+impl<I: Into<Cow<'static, str>>> From<I> for Label {
+    fn from(value: I) -> Self {
+        Self {
+            name: Default::default(),
+            text: value.into(),
+            x_positions: Vec::default(),
+            y_positions: Vec::default(),
+            align_horizontal: None,
+            align_vertical: None,
+            positioning: None,
+            text_config: None,
+        }
+    }
+}
+
+impl CommandLineEmbeddingInterface for Label {
+    fn write<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        cmd::Add("label", &self.name).write(writer)?;
+        cmd::ToUnique(&self.name).for_call(writer, |writer| {
+            cmd::Set("label", &self.text).write(writer)?;
+            if !self.x_positions.is_empty() {
+                cmd::SetData(
+                    "xPos",
+                    &self
+                        .x_positions
+                        .iter()
+                        .map(ToString::to_string)
+                        .collect::<Vec<_>>()
+                        .join(","),
+                )
+                .write(writer)?;
+            }
+            if !self.y_positions.is_empty() {
+                cmd::SetData(
+                    "yPos",
+                    &self
+                        .y_positions
+                        .iter()
+                        .map(ToString::to_string)
+                        .collect::<Vec<_>>()
+                        .join(","),
+                )
+                .write(writer)?;
+            }
+            if let Some(alignment) = &self.align_horizontal {
+                cmd::Set("alignHorz", alignment.as_str()).write(writer)?;
+            }
+            if let Some(alignment) = &self.align_vertical {
+                cmd::Set("alignVert", alignment.as_str()).write(writer)?;
+            }
+            if let Some(positioning) = &self.positioning {
+                cmd::Set("positioning", positioning.as_str()).write(writer)?;
+            }
+            if let Some(text_config) = &self.text_config {
+                if let Some(size) = &text_config.size {
+                    cmd::Set("Text/size", &size.to_string()).write(writer)?;
+                }
+            }
+            Ok(())
+        })
+    }
+}
+
+#[derive(Default)]
+pub struct TextConfig {
+    size: Option<TextSize>,
+}
+
+impl<T: Into<TextSize>> From<T> for TextConfig {
+    fn from(value: T) -> Self {
+        Self {
+            size: Some(value.into()),
+        }
+    }
+}
+
+pub enum TextSize {
+    Pt(f64),
+}
+
+impl ToString for TextSize {
+    fn to_string(&self) -> String {
+        match self {
+            TextSize::Pt(pt) => format!("{pt}pt"),
+        }
+    }
+}
+
+pub enum Alignment {
+    Top,
+    Bottom,
+    Left,
+    Right,
+    Center,
+}
+
+impl Alignment {
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Alignment::Top => "top",
+            Alignment::Bottom => "bottom",
+            Alignment::Left => "left",
+            Alignment::Right => "right",
+            Alignment::Center => "centre",
+        }
+    }
+}
+
+pub enum Positioning {
+    Relative,
+    Axes,
+}
+
+impl Positioning {
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Positioning::Relative => "relative",
+            Positioning::Axes => "axes",
+        }
     }
 }
