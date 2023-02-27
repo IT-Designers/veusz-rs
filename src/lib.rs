@@ -1,4 +1,4 @@
-use crate::api1::CommandLineEmbeddingInterface;
+use crate::api1::{cmd, CommandLineEmbeddingInterface};
 use crate::data::Data;
 use crate::export::Export;
 use crate::page::Page;
@@ -95,9 +95,15 @@ impl Veusz {
             .unwrap();
 
         let mut proc = std::process::Command::new("veusz")
-            .arg("--unsafe-mode")
-            .arg(path.as_ref().as_os_str())
+            .arg("--listen")
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::inherit())
+            .stderr(std::process::Stdio::inherit())
             .spawn()
+            .unwrap();
+
+        cmd::Load(path.as_ref().as_os_str().to_string_lossy().as_ref())
+            .write(BufWriter::new(proc.stdin.as_mut().unwrap()).borrow_mut())
             .unwrap();
 
         move || proc.wait()

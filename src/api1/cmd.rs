@@ -55,3 +55,12 @@ impl SetData<'_, '_> {
         writeln!(writer, "SetData(u'{}', [{}])", self.0, self.1)
     }
 }
+
+#[must_use]
+pub struct Load<'a>(pub &'a str);
+
+impl Load<'_> {
+    pub fn write<W: Write>(self, writer: &mut W) -> std::io::Result<()> {
+        writeln!(writer, "Load('{}')", self.0)
+    }
+}
