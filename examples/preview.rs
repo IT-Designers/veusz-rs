@@ -14,7 +14,7 @@ const SCALE: f64 = 100.0;
 fn main() {
     Veusz::default()
         .with_page(
-            Page::default().with(
+            Page::default().with_item(
                 Graph::default()
                     .with_axis(Axis::x("x"))
                     .with_axis(Axis::y("y"))
