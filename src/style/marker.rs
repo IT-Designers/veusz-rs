@@ -92,7 +92,7 @@ impl CommandLineEmbeddingInterface for MarkerLine {
         }
 
         if let Some(width) = &self.width {
-            cmd::Set("MarkerLine/width", &format!("{}pt", width)).write(writer)?;
+            cmd::Set("MarkerLine/width", &format!("{width}pt")).write(writer)?;
         }
 
         if let Some(style) = &self.style {

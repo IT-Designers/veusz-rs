@@ -13,7 +13,7 @@ impl Data {
         Data {
             name: name.into(),
             value: data
-                .map(|d| format!("{}", d))
+                .map(|d| format!("{d}"))
                 .collect::<Vec<String>>()
                 .join(", "),
         }

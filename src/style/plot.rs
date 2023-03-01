@@ -86,7 +86,7 @@ impl CommandLineEmbeddingInterface for PlotLine {
         }
 
         if let Some(width) = &self.width {
-            cmd::Set("PlotLine/width", &format!("{}pt", width)).write(writer)?;
+            cmd::Set("PlotLine/width", &format!("{width}pt")).write(writer)?;
         }
 
         if let Some(style) = &self.style {
