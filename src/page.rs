@@ -1,4 +1,5 @@
 use crate::api1::{cmd, AutoName};
+use crate::size::SizeUnit;
 use crate::style::marker::{Marker, MarkerFill, MarkerLine};
 use crate::style::plot::PlotLine;
 use crate::style::Color;
@@ -10,6 +11,8 @@ use std::io::Write;
 pub struct Page {
     name: AutoName<Self>,
     items: Vec<PageItem>,
+    width: Option<SizeUnit>,
+    height: Option<SizeUnit>,
 }
 
 impl Page {
@@ -26,6 +29,16 @@ impl Page {
         self.items.extend(items.into_iter().map(Into::into));
         self
     }
+
+    pub fn with_width(mut self, width: impl Into<Option<SizeUnit>>) -> Self {
+        self.width = width.into();
+        self
+    }
+
+    pub fn with_height(mut self, height: impl Into<Option<SizeUnit>>) -> Self {
+        self.height = height.into();
+        self
+    }
 }
 
 impl CommandLineEmbeddingInterface for Page {
@@ -36,7 +49,17 @@ impl CommandLineEmbeddingInterface for Page {
                 item.write(writer)?;
             }
             Ok(())
-        })
+        })?;
+
+        if let Some(width) = self.width {
+            cmd::Set("width", &width.to_string()).write(writer)?;
+        }
+
+        if let Some(height) = self.height {
+            cmd::Set("height", &height.to_string()).write(writer)?;
+        }
+
+        Ok(())
     }
 }
 

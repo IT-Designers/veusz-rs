@@ -12,6 +12,7 @@ pub mod api1;
 pub mod data;
 pub mod export;
 pub mod page;
+pub mod size;
 pub mod style;
 
 #[derive(Default)]
