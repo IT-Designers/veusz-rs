@@ -224,6 +224,8 @@ pub struct Axis {
     name: String,
     label: String,
     direction: Option<AxisDirection>,
+    min: Option<f64>,
+    max: Option<f64>,
 }
 
 impl Axis {
@@ -232,6 +234,8 @@ impl Axis {
             name: "x".into(),
             label: label.into(),
             direction: None,
+            min: None,
+            max: None,
         }
     }
 
@@ -240,7 +244,19 @@ impl Axis {
             name: "y".into(),
             label: label.into(),
             direction: Some(AxisDirection::Vertical),
+            min: None,
+            max: None,
         }
+    }
+
+    pub fn with_min(mut self, min: impl Into<Option<f64>>) -> Self {
+        self.min = min.into();
+        self
+    }
+
+    pub fn with_max(mut self, max: impl Into<Option<f64>>) -> Self {
+        self.max = max.into();
+        self
     }
 }
 
@@ -259,6 +275,14 @@ impl CommandLineEmbeddingInterface for Axis {
                     },
                 )
                 .write(writer)?;
+            }
+
+            if let Some(min) = self.min {
+                cmd::SetRaw("min", min).write(writer)?;
+            }
+
+            if let Some(max) = self.max {
+                cmd::SetRaw("max", max).write(writer)?;
             }
 
             Ok(())
