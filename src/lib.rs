@@ -56,6 +56,13 @@ impl Veusz {
         self
     }
 
+    pub fn with_exports(mut self, exports: impl Iterator<Item = impl Into<Export>>) -> Self {
+        for export in exports {
+            self.exports.push(export.into());
+        }
+        self
+    }
+
     /// Please consider [`BufWriter`] for optimal performance.
     pub fn save_configuration<W: Write>(&self, writer: &mut W) -> std::io::Result<()> {
         self.write(writer)
