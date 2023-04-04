@@ -7,7 +7,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/itdesigners/veusz-rs/issues/new)
 
 This crate provides a Rust API for the [Veusz command line and embedding interface (API)](https://veusz.github.io/docs/manual/api.html).
-Not all commands are implemented yet, but enough for simple plots like the following (see the [examples](examples)):
+Not all commands are implemented yet, but enough for simple plots like the following (see the [examples](https://github.com/itdesigners/veusz-rs/tree/master/examples)):
 
 ![preview](examples/preview.svg)
 
